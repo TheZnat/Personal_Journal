@@ -2,4 +2,12 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": "explicit"
     },
+
+    "emmet.includeLanguages": {
+        "javascript": "javascriptreact",
+    },
+
+    "emmet.preferences": {
+
+    },
 }
