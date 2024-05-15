@@ -4,8 +4,6 @@ import Leftpanel from './layout/Leftpanel/Leftpanel';
 import JournalList from './components/JournalList/JournalList';
 import JournalAddButton from './components/JournalAddButton/JournalAddButton';
 import Header from './components/Header/Header';
-import CardButton from './components/CardButton/CardButton';
-import JournalItem from './components/JournalItem/JournalItem';
 import JournalForm from './components/JournalForm/JournalForm';
 import { useState } from 'react';
 
@@ -48,12 +46,8 @@ function App() {
 			</Leftpanel>
 
 			<Body>
-				<p>Body</p>
 				<JournalForm onSubmit={addItem} />
-				
-		
 			</Body>	
-			
 		</div> 
 	);
 }
