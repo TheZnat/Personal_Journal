@@ -1,3 +1,4 @@
+/*eslint indent: "error"*/
 export const INITIAL_STATE = {
   isValid: {
     title: true,
@@ -5,9 +6,10 @@ export const INITIAL_STATE = {
     text: true,
   },
   values: {
-    title: undefined,
-    date: undefined,
-    text: undefined,
+    title: "",
+    date: "",
+    text: "",
+    tag: "",
   },
   isFormReadyToSubmit: false,
 };
@@ -16,19 +18,23 @@ export function formReducer(state, action) {
   switch (action.type) {
     case "RESET_VALIDATION":
       return { ...state, isValid: INITIAL_STATE.isValid };
+    case "SET_VALUE":
+      return { ...state, values: { ...state.values, ...action.payload } };
     case "SUBMIT": {
-        const titleValidity = action.payload.title?.trim().length;
-        const dateValidity = action.payload.date;
-        const textValidity = action.payload.text.trim().length;
-        return{
-            values: action.payload,
-            isValid:{
-                title: titleValidity,
-                date: dateValidity,
-                text: textValidity,
-            },
-            isFormReadyToSubmit: titleValidity && dateValidity && textValidity
-        }
+      const titleValidity = state.values.title?.trim().length;
+      const dateValidity = state.values.date;
+      const textValidity = state.values.text.trim().length;
+      return {
+        ...state,
+        isValid: {
+          title: titleValidity,
+          date: dateValidity,
+          text: textValidity,
+        },
+        isFormReadyToSubmit: titleValidity && dateValidity && textValidity,
+      };
     }
+    case "CLEAR":
+      return { ...state, values: INITIAL_STATE.values, isFormReadyToSubmit: false };
   }
 }

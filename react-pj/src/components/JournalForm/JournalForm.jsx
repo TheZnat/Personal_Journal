@@ -28,16 +28,18 @@ const JournalForm = ({onSubmit}) => {
 	useEffect(() => {
 		if(isFormReadyToSubmit){
 			onSubmit(values);
+			dispatchForm({type:'CLEAR'});
 		}
-	},[isFormReadyToSubmit]);
+	},[isFormReadyToSubmit, values, onSubmit]);
 	
 
 	const addJournalItem = (e) => {
 		e.preventDefault();
-		const fromData = new FormData(e.target);
-		const fromProps = Object.fromEntries(fromData);
-		dispatchForm({type:'SUBMIT', payload:fromProps});
-	
+		dispatchForm({type:'SUBMIT'});
+	};
+
+	const onChange = (e) => {
+		dispatchForm({type:'SET_VALUE', payload:{ [e.target.name] : e.target.value}});
 
 	};
 	
@@ -46,7 +48,7 @@ const JournalForm = ({onSubmit}) => {
 		
 		<form className={styles.form} onSubmit={addJournalItem}>
 			<div>
-				<input type='text' name='title' placeholder='Заголовок для новй записи'
+				<input type='text' name='title' value={values.title} onChange={onChange} placeholder='Заголовок для новй записи'
 					className={cn(styles.title, styles.input,{[styles.invalid]: !isValid.title })}/>
 			</div>
             
@@ -56,13 +58,13 @@ const JournalForm = ({onSubmit}) => {
 						<img src="/date.svg" alt='Иконка календаря'/>
 						<span>Дата</span>
 					</label>
-					<input type='date' name='date' id='date'
+					<input type='date' name='date' id='date' value={values.date} onChange={onChange}
 						className={cn(styles['input-label'], {[styles.invalid]: !isValid.date })}/> 
 				</div>
 
 
 				<div className={styles['form-row']}>
-					<label htmlFor='tag' className={styles['form-label']}>
+					<label htmlFor='tag' className={styles['form-label']} value={values.tag} onChange={onChange} >
 						<img src="/tag.svg" alt='Иконка Метки'/>
 						<span>Метки</span>
 					</label>
@@ -71,7 +73,7 @@ const JournalForm = ({onSubmit}) => {
 
 			</div>
 			
-			<textarea name='text' placeholder='Здесь будет текст ...'
+			<textarea name='text' value={values.text} placeholder='Здесь будет текст ...' onChange={onChange}
 				className={cn(styles.text, styles.input, styles['input-text'], {[styles.invalid]: !isValid.text })}></textarea>
 			<div>
 				<Button text='Сохранить'/>
