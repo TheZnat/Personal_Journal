@@ -1,46 +1,43 @@
-import {useState} from 'react';
+import {useEffect, useReducer} from 'react';
 import classnames from 'classnames';
 import styles from './JournalForm.module.css';
 import Button from '../Button/Button';
+import { INITIAL_STATE, formReducer } from './JournalForm.state';
+
 
 
 const JournalForm = ({onSubmit}) => {
 	let cn = classnames;
 
-	const [formValidState, SetFormValidState] = useState({
-		title: true,
-		date: true,
-		text: true
-	});
+	const [formState, dispatchForm] = useReducer(formReducer, INITIAL_STATE);
+	const {isValid, isFormReadyToSubmit, values} = formState;
+
+	useEffect(() => {
+		let timerId;
+		if(!isValid.date || !isValid.text || !isValid.title){
+			timerId = setInterval(() => {
+				dispatchForm({type:'RESET_VALIDATION'});
+			},1700);
+		}
+		return() =>{
+			clearTimeout(timerId);
+		};
+
+	},[isValid]);
+	
+	useEffect(() => {
+		if(isFormReadyToSubmit){
+			onSubmit(values);
+		}
+	},[isFormReadyToSubmit]);
 	
 
 	const addJournalItem = (e) => {
 		e.preventDefault();
 		const fromData = new FormData(e.target);
 		const fromProps = Object.fromEntries(fromData);
-		let isFormValid = true;
-		if (!fromProps.title?.trim().length) {
-			SetFormValidState(state => ({...state, title: false}));
-			isFormValid = false;
-		} else{
-			SetFormValidState(state => ({...state, title: true}));
-		}
-		if (!fromProps.text?.trim().length) {
-			SetFormValidState(state => ({...state, text: false}));
-			isFormValid = false;
-		} else{
-			SetFormValidState(state => ({...state, text: true}));
-		}
-		if (!fromProps.date) {
-			SetFormValidState(state => ({...state, date: false}));
-			isFormValid = false;
-		} else{
-			SetFormValidState(state => ({...state, date: true}));
-		}
-		if (!isFormValid){
-			return ;
-		}
-		onSubmit(fromProps);
+		dispatchForm({type:'SUBMIT', payload:fromProps});
+	
 
 	};
 	
@@ -50,7 +47,7 @@ const JournalForm = ({onSubmit}) => {
 		<form className={styles.form} onSubmit={addJournalItem}>
 			<div>
 				<input type='text' name='title' placeholder='Заголовок для новй записи'
-					className={cn(styles.title, styles.input,{[styles.invalid]: !formValidState.title })}/>
+					className={cn(styles.title, styles.input,{[styles.invalid]: !isValid.title })}/>
 			</div>
             
 			<div className={styles['form-info']}>
@@ -60,7 +57,7 @@ const JournalForm = ({onSubmit}) => {
 						<span>Дата</span>
 					</label>
 					<input type='date' name='date' id='date'
-						className={cn(styles['input-label'], {[styles.invalid]: !formValidState.date })}/> 
+						className={cn(styles['input-label'], {[styles.invalid]: !isValid.date })}/> 
 				</div>
 
 
@@ -75,7 +72,7 @@ const JournalForm = ({onSubmit}) => {
 			</div>
 			
 			<textarea name='text' placeholder='Здесь будет текст ...'
-				className={cn(styles.text, styles.input, styles['input-text'], {[styles.invalid]: !formValidState.text })}></textarea>
+				className={cn(styles.text, styles.input, styles['input-text'], {[styles.invalid]: !isValid.text })}></textarea>
 			<div>
 				<Button text='Сохранить'/>
 			</div>

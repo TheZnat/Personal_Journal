@@ -1,7 +1,7 @@
 import styles from'./JournalItem.module.css';
 
-const JournalItem = ({title, text, data }) => {
-	const formatedDate = new Intl.DateTimeFormat('ru-RU').format(data);
+const JournalItem = ({title, text, date }) => {
+	const formatedDate = new Intl.DateTimeFormat('ru-RU').format(date);
 	return (
 		<div>
 			<h2 className={styles.header}>{title}</h2>

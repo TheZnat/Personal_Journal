@@ -5,29 +5,30 @@ import JournalList from './components/JournalList/JournalList';
 import JournalAddButton from './components/JournalAddButton/JournalAddButton';
 import Header from './components/Header/Header';
 import JournalForm from './components/JournalForm/JournalForm';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 
 function App() {
 
-	const INITIALIZATION_DATA = [
-		// {
-		// 	id: 1,
-		// 	title: 'Подготовка к обновлению курсов',
-		// 	text: 'Сегодня провёл весь день за..' ,
-		// 	data: new Date()
-		// },
-		// {
-		// 	id: 2,
-		// 	title: 'Подготовка к обновлению курсов',
-		// 	text: 'Сегодня провёл весь день за..' ,
-		// 	data: new Date()
-		// }
-	];
+	const [items, SetItems] = useState([]);
+	
+	useEffect(()=> {
+		const data = JSON.parse(localStorage.getItem('data'));
+		if (data){
+			SetItems(data.map(item =>({
+				...item,
+				date: new Date(item.date)
+			})));
+		}
+	}, []);
 
-	const [items, SetItems] = useState(INITIALIZATION_DATA);
+	useEffect(()=> {
+		if (items.length){
+			localStorage.setItem('data', JSON.stringify(items));
+		}
+	},[items]);
 
-	const addItem = (item) =>{
+	const addItem = item =>{
 		SetItems(oldItem => [...oldItem, {
 			title: item.title,
 			text: item.text,
