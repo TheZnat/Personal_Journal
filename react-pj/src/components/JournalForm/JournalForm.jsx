@@ -1,4 +1,4 @@
-import {useEffect, useReducer} from 'react';
+import {useEffect, useReducer, useRef} from 'react';
 import classnames from 'classnames';
 import styles from './JournalForm.module.css';
 import Button from '../Button/Button';
@@ -11,10 +11,30 @@ const JournalForm = ({onSubmit}) => {
 
 	const [formState, dispatchForm] = useReducer(formReducer, INITIAL_STATE);
 	const {isValid, isFormReadyToSubmit, values} = formState;
+	const titleRef = useRef();
+	const dateRef = useRef();
+	const textRef = useRef();
+
+	let focusError = (isValid) => {
+		switch (true) {
+		case !isValid.title:
+			titleRef.current.focus();
+			break;
+		case !isValid.date:
+			dateRef.current.focus();
+			break;
+		case !isValid.text:
+			textRef.current.focus();
+			break;		
+		}
+
+	};
+	
 
 	useEffect(() => {
 		let timerId;
 		if(!isValid.date || !isValid.text || !isValid.title){
+			focusError(isValid);
 			timerId = setInterval(() => {
 				dispatchForm({type:'RESET_VALIDATION'});
 			},1700);
@@ -48,7 +68,8 @@ const JournalForm = ({onSubmit}) => {
 		
 		<form className={styles.form} onSubmit={addJournalItem}>
 			<div>
-				<input type='text' name='title' value={values.title} onChange={onChange} placeholder='Заголовок для новй записи'
+				<input type='text' name='title' ref={titleRef} 
+					value={values.title} onChange={onChange} placeholder='Заголовок для новй записи'
 					className={cn(styles.title, styles.input,{[styles.invalid]: !isValid.title })}/>
 			</div>
             
@@ -62,19 +83,19 @@ const JournalForm = ({onSubmit}) => {
 						className={cn(styles['input-label'], {[styles.invalid]: !isValid.date })}/> 
 				</div>
 
-
 				<div className={styles['form-row']}>
 					<label htmlFor='tag' className={styles['form-label']} value={values.tag} onChange={onChange} >
 						<img src="/tag.svg" alt='Иконка Метки'/>
 						<span>Метки</span>
 					</label>
-					<input type='text'  name='tag' id='tag' className={cn(styles['input-label'])}/>
+					<input type='text'  name='tag' id='tag' className={cn(styles['input-label'])} ref={dateRef}/>
 				</div>
 
 			</div>
 			
-			<textarea name='text' value={values.text} placeholder='Здесь будет текст ...' onChange={onChange}
-				className={cn(styles.text, styles.input, styles['input-text'], {[styles.invalid]: !isValid.text })}></textarea>
+			<textarea name='text' value={values.text} placeholder='Здесь будет текст ...' ref={textRef}
+				onChange={onChange} className={cn(styles.text, styles.input, styles['input-text'], {[styles.invalid]: !isValid.text })}>
+			</textarea>
 			<div>
 				<Button text='Сохранить'/>
 			</div>
